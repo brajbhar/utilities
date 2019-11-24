@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>:::Cache POC:::</title>
+<link rel="stylesheet" href="styles/bootstrap.min.css">
+<script data-main="scripts/main.js" src="scripts/lib/require.js"></script>
+</head>
+<body>
+	<div class="container" style="margin-top: 20px;">
+
+		<header>
+			<h1>Pdf Files</h1>
+		</header>
+
+		<form id="pdfForm" enctype="multipart/form-data" method="post">
+		<div id="fileControls">
+			<div class="row">
+				<div class="input-group mb-3">
+					<div class="custom-file">
+						<input type="file" class="custom-file-input" id="file1" name="files" onchange="">
+						<label class="custom-file-label" for="file1" id="file1-label">Choose
+							file</label>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="mb-3">
+				<button type="button" class="btn btn-primary" id="mergePdf">Merge</button>
+			</div>
+			<div class="mb-3">
+				<button type="button" class="btn btn-primary" id="addNewPdf">Add New</button>
+			</div>
+		</div>
+
+		</form>
+	</div>
+</body>
+</html>

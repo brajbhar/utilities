@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>:::Cache POC:::</title>
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container" style="margin-top:20px;">
+
+<form >
+  <div class="row">
+	   <input type="text" class="form-control col-sm-2" 
+	   	placeholder="Size in MB" id="sizeInMB" name="sizeInMB">
+	   <button type="button" style="margin-left:20px" id="loadBinaryBtn"
+	   		class="btn btn-primary col-sm-3" onclick="loadBinary();"
+	   		>Load Binary</button>
+   </div>
+   <div class="row" style="margin-top:20px;">
+   <button type="button" class="btn btn-primary col-sm-4" onclick="launchNewInstance();">Launch New Instance</button>
+  	</div>
+  	<div style="margin-top:20px;">
+  	
+  		<label>Time taken to load from Network</label> 
+  		<input type="text" value="" id="timeFromNetwork" class="form-control col-sm-2">
+  	</div>
+  	<div >
+  		<label>Time taken to load from Cache</label> 
+  		<input type="text" value="" id="timeFromCache" class="form-control col-sm-2">
+  	</div>
+  	<div >
+  		<label>Time taken to put request in Cache</label> 
+  		<input type="text" value="" id="timeToPutInCache" class="form-control col-sm-2">
+  	</div>
+</form>
+	
+	
+</div>
+
+
+
+<script type="text/javascript">
+	var CACHE_VERSION = 1;
+	var CURRENT_CACHES = {
+		image: 'image-cache-v-' + CACHE_VERSION
+	};
+	
+	
+	function launchNewInstance() {
+		var launchUrl = "http://localhost:8080/index.html";
+		window.open(launchUrl, '_blank', 'toolbar=0,location=0,menubar=0');
+	}
+	
+	function loadBinary() {
+		document.getElementById('loadBinaryBtn').disabled = true;
+		var sizeInMB = document.getElementById('sizeInMB').value;
+		var binaryUrl = 'download?sizeInMB=' + sizeInMB;
+		
+		var myRequest = new Request(binaryUrl);
+		console.log('Checking if cache has image');
+		var startTime = new Date();
+		caches.open(CURRENT_CACHES['image']).then(function(cache){
+			return cache.match(myRequest).then(function(response){
+				
+				if(response) {
+					var endTime = new Date();
+					var timeFromCache = endTime - startTime;
+					console.log('Time taken to get response from cache is : '+(timeFromCache));
+					document.getElementById('timeFromCache').value = timeFromCache;
+					document.getElementById('timeFromNetwork').value = '';
+					console.log('Found response in cache:', response);
+					document.getElementById('loadBinaryBtn').disabled = false;
+					return response;
+				}
+				console.log('Fetching request from the network');
+				fetch(myRequest).then(function(response){
+					var endTime = new Date();
+					var timeFromNetwork = endTime - startTime;
+					console.log('Time taken to get response from network is : '+(timeFromNetwork));
+					document.getElementById('timeFromNetwork').value = timeFromNetwork;
+					document.getElementById('timeFromCache').value = '';
+					console.log('Found response from network:', response);
+					startTime = new Date();
+					cache.put(myRequest, response.clone()).then(function(){
+						var endTime = new Date();
+						var timeToPutInCache = endTime - startTime;
+						document.getElementById('timeToPutInCache').value = timeToPutInCache;
+						document.getElementById('loadBinaryBtn').disabled = false;
+					});
+					return response;
+					
+				});
+			});
+		}).catch(function(error) {
+	        
+	        // Handles exceptions that arise from match() or fetch().
+	        console.error('Error in fetch handler:', error);
+
+	        throw error;
+	      }); 
+		
+	}
+	
+	function loadAllBinaries() {
+		var frameSize = 1, frames = 100;
+		for(var i = 1; i<=frames; i++) {
+			(function(foo){
+			var binaryUrl = 'download?sizeInMB=' + frameSize + '&frame=' + foo;
+			var myRequest = new Request(binaryUrl);
+			console.log('Checking if cache has image for frame '+ foo);
+			var startTime = new Date();
+			caches.open(CURRENT_CACHES['image']).then(function(cache){
+				return cache.match(myRequest).then(function(response){
+					
+					if(response) {
+						var endTime = new Date();
+						var timeFromCache = endTime - startTime;
+						console.log('Time taken to get response from cache is : '+(timeFromCache));
+						console.log('Found response in cache:', response);
+						return response;
+					}
+					console.log('Fetching request from the network');
+					fetch(myRequest).then(function(response){
+						var endTime = new Date();
+						var timeFromNetwork = endTime - startTime;
+						startTime = new Date();
+						console.log('Time taken to get response from network is : '+(timeFromNetwork));
+						console.log('Found response from network:', response);
+						cache.put(myRequest, response.clone()).then(function(){
+							//document.getElementById('loadBinaryBtn').disabled = false;
+						});
+						return response;
+						
+					});
+				});
+			}).catch(function(error) {
+		        
+		        // Handles exceptions that arise from match() or fetch().
+		        console.error('Error in fetch handler:', error);
+
+		        throw error;
+		      }); 
+			})(i);
+		}
+	
+	}
+	
+	function cleanCache() {
+		caches.open('image-cache-v-1').then(function(cache) {
+			  cache.keys().then(function(keys) {
+			    keys.forEach(function(request, index, array) {
+			      console.log(request);
+			    cache.delete(request);
+			    });
+			  });
+			})
+	}
+	
+	
+	
+</script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+</body>
+</html>
