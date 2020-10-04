@@ -1,4 +1,4 @@
-package com.citiustech.barcodedemo.controller;
+package com.learning.barcodedemo.controller;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

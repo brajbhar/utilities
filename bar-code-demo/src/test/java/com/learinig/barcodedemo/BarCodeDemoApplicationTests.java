@@ -1,12 +1,14 @@
-package com.citiustech.barcodedemo;
+package com.learinig.barcodedemo;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+
 class BarCodeDemoApplicationTests {
 
-	@Test
+
+
 	void contextLoads() {
 	}
 

@@ -1,4 +1,4 @@
-package com.citiustech.barcodedemo;
+package com.learning.barcodedemo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
